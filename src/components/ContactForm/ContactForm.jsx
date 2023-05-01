@@ -1,15 +1,22 @@
-import { useDispatch } from "react-redux"
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from "react-redux"
+import {selectFilterContacts } from 'Redux/Contact/selectors'
+import { Notify } from "notiflix/build/notiflix-notify-aio";
 import { addContact } from "Redux/Contact/contactsSlice";
 import { Title, Form, Input, Label, Button } from './ContactForm.styled';
 
 
 export const ContactForm = () => {
     const dispatch = useDispatch()
+    const contacts = useSelector(selectFilterContacts);
  const   handleSubmit =(e)=>{
-e.preventDefault()
+  e.preventDefault()
+  if (contacts.find((contact) => contact.name === e.target.elements.name.value || contact.number === e.target.elements.number.value)) {
+    Notify.failure(`Contact with such data have already existed!`);
+    return;
+  }
 dispatch(addContact({name: e.target.elements.name.value, id: Date.now(), number: e.target.elements.number.value, }))
-    }
+e.target.reset();
+}
 return (
     <>
       <Title>Phonebook</Title>
@@ -35,6 +42,3 @@ return (
     </>
   );
 };
-ContactForm.propTypes = {
-    addContact: PropTypes.func.isRequired,
-  };
